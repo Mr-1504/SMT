@@ -11,8 +11,8 @@ from ExperimentConfig import ExperimentConfig
 from data_augmentation.data_augmentation import augment, convert_img_to_tensor
 from utils import check_and_retrieveVocabulary, parse_kern
 from lightning import LightningDataModule
+from lightning import LightningDataModule
 from torch.utils.data import Dataset
-from SynthGenerator import VerovioGenerator
 
 # For single-system datasets
 def prepare_data(sample, reduce_ratio=1.0, fixed_size=None):
@@ -38,7 +38,9 @@ def prepare_data(sample, reduce_ratio=1.0, fixed_size=None):
     gt = gt.replace("\n", " <b> ")
 
     sample["transcription"] = ["<bos>"] + gt.split(" ") + ["<eos>"]
-    sample["image"] = img
+    
+    from PIL import Image
+    sample["image"] = Image.fromarray(img)
 
     return sample
 
@@ -61,7 +63,8 @@ def prepare_fp_data(
     height = int(np.ceil(img.shape[0] * reduce_ratio))
     img = cv2.resize(img, (width, height))
 
-    sample["image"] = img
+    from PIL import Image
+    sample["image"] = Image.fromarray(img)
 
     return sample
 
@@ -276,6 +279,7 @@ class SyntheticOMRDataset(OMRIMG2SEQDataset):
             krn_format: str = "bekern"
             ) -> None:
         super().__init__(teacher_forcing_error_rate, augment)
+        from SynthGenerator import VerovioGenerator
         self.generator = VerovioGenerator(sources=data_path, split=split, krn_format=krn_format)
 
         self.num_sys_gen: int = number_of_systems
@@ -319,6 +323,7 @@ class CurriculumTrainingDataset(GrandStaffFullPage):
             skip_steps: int = 0,
             *args, **kwargs
             ) -> None:
+        from SynthGenerator import VerovioGenerator
         self.generator = VerovioGenerator(sources=synthetic_sources, split=split, krn_format=krn_format)
         super().__init__(
                 data_path=data_path,
