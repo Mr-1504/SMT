@@ -52,7 +52,7 @@ def load_set(dataset, split="train", reduce_ratio=1.0, fixed_size=None):
 def prepare_fp_data(
         sample,
         reduce_ratio: float = 1.0,
-        krn_format: Literal["kern"] | Literal["ekern"] | Literal["bekern"] = "bekern",
+        krn_format: Literal["kern", "ekern", "bekern"] = "bekern",
         ):
     sample["transcription"] = ['<bos>'] + parse_kern(sample["transcription"], krn_format=krn_format)[4:] + ['<eos>'] # Remove **kern, **ekern and **bekern header
 
