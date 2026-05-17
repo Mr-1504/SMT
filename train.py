@@ -9,6 +9,7 @@ from lightning.pytorch import Trainer
 from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.loggers import WandbLogger
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
+from visualize_callbacks import SMTVisualizerCallback
 
 torch.set_float32_matmul_precision('high')
 
@@ -36,9 +37,11 @@ def main(config_path):
                                    monitor=config.checkpoint.monitor, mode=config.checkpoint.mode,
                                    save_top_k=config.checkpoint.save_top_k, verbose=config.checkpoint.verbose)
 
+    visualizer = SMTVisualizerCallback(output_dir="visualizations")
+
     trainer = Trainer(max_epochs=10000,
                       check_val_every_n_epoch=5,
-                      logger=wandb_logger, callbacks=[checkpointer, early_stopping], precision='16-mixed')
+                      logger=wandb_logger, callbacks=[checkpointer, early_stopping, visualizer], precision='16-mixed')
 
     trainer.fit(model_wrapper,datamodule=datamodule)
 
