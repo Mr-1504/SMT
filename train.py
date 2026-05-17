@@ -1,6 +1,11 @@
 import fire
 import json
 import torch
+import cv2
+
+# Tắt đa luồng của OpenCV để tránh đụng độ với DataLoader của PyTorch gây ra Segmentation fault
+cv2.setNumThreads(0)
+
 from data import GrandStaffDataset
 from smt_trainer import SMT_Trainer
 
