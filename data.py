@@ -3,6 +3,12 @@ import random
 import re
 import cv2
 import torch
+
+def worker_init_fn(worker_id):
+    """Disable OpenCV internal threading trong mỗi DataLoader worker
+    để tránh conflict với multiprocessing của PyTorch gây Segmentation Fault."""
+    import cv2
+    cv2.setNumThreads(0)
 import numpy as np
 import cv2
 
@@ -471,13 +477,31 @@ class GrandStaffDataset(LightningDataModule):
         return max(Tl, vl, tl)
 
     def train_dataloader(self):
-        return torch.utils.data.DataLoader(self.train_set, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=True, collate_fn=batch_preparation_img2seq)
+        return torch.utils.data.DataLoader(
+            self.train_set, batch_size=self.batch_size, num_workers=self.num_workers,
+            shuffle=True, collate_fn=batch_preparation_img2seq,
+            worker_init_fn=worker_init_fn,
+            persistent_workers=(self.num_workers > 0),
+            multiprocessing_context='spawn' if self.num_workers > 0 else None,
+        )
 
     def val_dataloader(self):
-        return torch.utils.data.DataLoader(self.val_set, batch_size=self.batch_size, num_workers=self.num_workers, collate_fn=batch_preparation_img2seq)
+        return torch.utils.data.DataLoader(
+            self.val_set, batch_size=self.batch_size, num_workers=self.num_workers,
+            collate_fn=batch_preparation_img2seq,
+            worker_init_fn=worker_init_fn,
+            persistent_workers=(self.num_workers > 0),
+            multiprocessing_context='spawn' if self.num_workers > 0 else None,
+        )
 
     def test_dataloader(self):
-        return torch.utils.data.DataLoader(self.test_set, batch_size=self.batch_size, num_workers=self.num_workers, collate_fn=batch_preparation_img2seq)
+        return torch.utils.data.DataLoader(
+            self.test_set, batch_size=self.batch_size, num_workers=self.num_workers,
+            collate_fn=batch_preparation_img2seq,
+            worker_init_fn=worker_init_fn,
+            persistent_workers=(self.num_workers > 0),
+            multiprocessing_context='spawn' if self.num_workers > 0 else None,
+        )
 
 # Synthetic system-level GrandStaff training
 # NOTE: Pre-train the SMT on system-level data using this dataset

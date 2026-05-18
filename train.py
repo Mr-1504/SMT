@@ -2,6 +2,12 @@ import fire
 import json
 import torch
 import cv2
+import torch.multiprocessing as mp
+
+# Fix Segmentation Fault khi dùng DataLoader workers trong WSL2 + CUDA:
+# Python mặc định dùng 'fork' trên Linux, nhưng fork một process đã có CUDA context
+# gây ra undefined behavior và segfault. 'spawn' tạo process mới hoàn toàn sạch.
+mp.set_start_method('spawn', force=True)
 
 # Tắt đa luồng của OpenCV để tránh đụng độ với DataLoader của PyTorch gây ra Segmentation fault
 cv2.setNumThreads(0)

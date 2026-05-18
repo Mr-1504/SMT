@@ -29,7 +29,9 @@ class SMTVisualizerCallback(L.Callback):
         2. Tạo ảnh minh họa vài mẫu dữ liệu gốc
         """
         print("\n[Visualizer] Đang kết xuất ảnh Data Augmentation và Data Gốc...")
-        train_loader = trainer.datamodule.train_dataloader()
+        # Dùng train_dataloader từ trainer thay vì tạo mới để tránh spawn thêm worker processes
+        # gây tốn memory và segfault
+        train_loader = trainer.train_dataloader
         batch = next(iter(train_loader))
         x, _, y = batch # x shape: (B, C, H, W)
         

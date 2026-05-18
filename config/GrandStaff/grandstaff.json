@@ -4,7 +4,7 @@
       "batch_size": 1,
       "vocab_name": "GrandStaff",
       "img_format": ".jpg",
-      "num_workers": 20,
+      "num_workers": 4,
       "reduce_ratio": 1.0
     },
 	"checkpoint": {
