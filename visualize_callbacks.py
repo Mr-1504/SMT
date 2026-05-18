@@ -29,10 +29,17 @@ class SMTVisualizerCallback(L.Callback):
         2. Tạo ảnh minh họa vài mẫu dữ liệu gốc
         """
         print("\n[Visualizer] Đang kết xuất ảnh Data Augmentation và Data Gốc...")
-        # Dùng train_dataloader từ trainer thay vì tạo mới để tránh spawn thêm worker processes
-        # gây tốn memory và segfault
-        train_loader = trainer.train_dataloader
-        batch = next(iter(train_loader))
+        # trainer.train_dataloader chưa được khởi tạo tại on_fit_start.
+        # Tạo DataLoader tạm thời với num_workers=0 chỉ để lấy 1 batch cho visualization.
+        from data import batch_preparation_img2seq
+        import torch.utils.data
+        temp_loader = torch.utils.data.DataLoader(
+            trainer.datamodule.train_set,
+            batch_size=4,
+            num_workers=0,
+            collate_fn=batch_preparation_img2seq,
+        )
+        batch = next(iter(temp_loader))
         x, _, y = batch # x shape: (B, C, H, W)
         
         # Lấy ảnh đầu tiên để minh họa Augmentation
