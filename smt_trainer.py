@@ -28,8 +28,10 @@ class SMT_Trainer(L.LightningModule):
 
         self.save_hyperparameters()
 
-        summary(self, input_size=[(1,1,self.config.maxh,self.config.maxw), (1,self.config.maxlen)],
-                dtypes=[torch.float, torch.long])
+        # summary() thực hiện forward pass với tensor (1,1,maxh,maxw) — kích thước có thể lên đến
+        # 3000x3056 pixels gây std::bad_alloc ngay khi khởi tạo model. Comment ra để tránh OOM.
+        # summary(self, input_size=[(1,1,self.config.maxh,self.config.maxw), (1,self.config.maxlen)],
+        #         dtypes=[torch.float, torch.long])
         self.current_stage: int = 1
         self.stage_calculator: Callable[[int], int] = lambda x: self.current_stage
 
