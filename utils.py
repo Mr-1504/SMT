@@ -81,7 +81,7 @@ def clean_kern(
         ) -> str:
     forbidden_pattern = "(" + "|".join([t.replace("*", "\\*") for t in forbidden_tokens]) + ")"
     krn = re.sub(f".*{forbidden_pattern}.*\n", "", krn) # Remove lines containing any of the forbidden tokens
-    krn = re.sub("(^|(?<=\n))\*(\s\*)*(\n|$)", "", krn) # Remove lines that only contain "*" tokens
+    krn = re.sub(r"(^|(?<=\n))\*(\s\*)*(\n|$)", "", krn) # Remove lines that only contain "*" tokens
     return krn.strip()
 
 def parse_kern(
@@ -89,7 +89,7 @@ def parse_kern(
         krn_format: Literal["standard", "kern", "ekern", "bekern"] = "bekern" 
         ) -> list[str]:
     krn = clean_kern(krn)
-    krn = re.sub("(?<=\=)\d+", "", krn)
+    krn = re.sub(r"(?<=\=)\d+", "", krn)
 
     krn = krn.replace(" ", " <s> ")
     krn = krn.replace("\t", " <t> ")
