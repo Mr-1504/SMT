@@ -55,9 +55,9 @@ class SMT_Trainer(L.LightningModule):
 
         stage = self.stage_calculator(self.global_step)
 
-        self.log('loss', loss, on_epoch=True, batch_size=1, prog_bar=True)
-        self.log("stage", stage, on_epoch=True, prog_bar=True)
-
+        self.log('loss', loss, on_step=True, on_epoch=True, batch_size=1, prog_bar=True)
+        self.log("stage", stage, on_step=True, on_epoch=True, prog_bar=True)
+        
         return loss
 
 
