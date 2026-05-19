@@ -55,6 +55,7 @@ def main(config_path):
     #                   logger=wandb_logger, callbacks=[checkpointer, early_stopping, visualizer], precision='16-mixed')
     trainer = Trainer(max_epochs=100,
                       strategy='ddp_find_unused_parameters_true',
+                      log_every_n_steps=5,
                       check_val_every_n_epoch=5,
                       logger=wandb_logger, 
                       callbacks=[checkpointer, early_stopping, visualizer], 
